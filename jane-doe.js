@@ -49,18 +49,29 @@ import {
 import { FileUtils } from "./utils/fileUtils";
 
 // clang-format on
+const resnetArchitectureName = "MobileNetV1";
 const avatarSvgs = {
-  "girl": girlSVG.default,
-  "boy": boySVG.default,
-  "abstract": abstractSVG.default,
-  "blathers": blathersSVG.default,
+  girl: girlSVG.default,
+  boy: boySVG.default,
+  abstract: abstractSVG.default,
+  blathers: blathersSVG.default,
   "tom-nook": tomNookSVG.default,
 };
-
+const sourceImages = {
+  boy_doughnut: boy_doughnut.default,
+  tie_with_beer: tie_with_beer.default,
+  test_img: test_img.default,
+  full_body: full_body.default,
+  full_body_1: full_body_1.default,
+  full_body_2: full_body_2.default,
+};
 
 let skeleton;
 let illustration;
 let canvasScope;
+
+let posenet;
+let facemesh;
 
 const VIDEO_WIDTH = 513;
 const VIDEO_HEIGHT = 513;
@@ -77,7 +88,7 @@ const defaultMinPartConfidence = 0.1;
 const defaultMinPoseConfidence = 0.2;
 const defaultNmsRadius = 20.0;
 
-// let predictedPoses;
+let predictedPoses;
 let faceDetection;
 let sourceImage;
 
@@ -85,47 +96,25 @@ let sourceImage;
  * Draws a pose if it passes a minimum confidence onto a canvas.
  * Only the pose's keypoints that pass a minPartConfidence are drawn.
  */
-function drawResults(image, canvas, faceDetection, poses) {
-  renderImageToCanvas(image, [VIDEO_WIDTH, VIDEO_HEIGHT], canvas);
+function drawResults(image, canvas, faceDetection, pose) {
+  // renderImageToCanvas(image, [VIDEO_WIDTH, VIDEO_HEIGHT], canvas);
   const ctx = canvas.getContext("2d");
 
-  var pose;
-
   fetch("https://mdjj-api.us-south.cf.appdomain.cloud/api")
-    .then((response) => response.json())
-    .then((data) => (predictedPoses = data))
-    .then((json) => console.log(json))
-    .catch((error) => console.log(error));
-
-  if (pose.score >= defaultMinPoseConfidence) {
-    if (guiState.showKeypoints) {
-      drawKeypoints(pose.keypoints, defaultMinPartConfidence, ctx);
+  .then((response) => response.json())
+  .then((pose) => {
+    console.log(pose)
+    if (pose.score >= defaultMinPoseConfidence) {
+      if (guiState.showKeypoints) {
+        drawKeypoints(pose.keypoints, defaultMinPartConfidence, ctx);
+      }
+  
+      if (guiState.showSkeleton) {
+        drawSkeleton(pose.keypoints, defaultMinPartConfidence, ctx);
+      }
     }
-
-    if (guiState.showSkeleton) {
-      drawSkeleton(pose.keypoints, defaultMinPartConfidence, ctx);
-    }
-  }
-
-  // poses.forEach((pose) => {
-  //   if (pose.score >= defaultMinPoseConfidence) {
-  //     if (guiState.showKeypoints) {
-  //       drawKeypoints(pose.keypoints, defaultMinPartConfidence, ctx);
-  //     }
-
-  //     if (guiState.showSkeleton) {
-  //       drawSkeleton(pose.keypoints, defaultMinPartConfidence, ctx);
-  //     }
-  //   }
-  // });
-  // if (guiState.showKeypoints) {
-  //   faceDetection.forEach((face) => {
-  //     Object.values(facePartName2Index).forEach((index) => {
-  //       let p = face.scaledMesh[index];
-  //       drawPoint(ctx, p[1], p[0], 3, "red");
-  //     });
-  //   });
-  // }
+  })
+  .catch((error) => console.log(error));
 }
 
 async function loadImage(imagePath) {
@@ -154,16 +143,28 @@ function getIllustrationCanvas() {
  */
 function drawDetectionResults() {
   const canvas = multiPersonCanvas();
-  drawResults(sourceImage, canvas, faceDetection, null);
-  // if (!predictedPoses || !predictedPoses.length || !illustration) {
-  //   return;
-  // }
+  drawResults(sourceImage, canvas, faceDetection, predictedPoses);
+  if (!predictedPoses || !predictedPoses.length || !illustration) {
+    return;
+  }
 
   skeleton.reset();
   canvasScope.project.clear();
 
-  illustration.updateSkeleton(predictedPoses[0], null);
-  illustration.draw(canvasScope, sourceImage.width, sourceImage.height);
+  if (faceDetection && faceDetection.length > 0) {
+    let face = Skeleton.toFaceFrame(faceDetection[0]);
+    illustration.updateSkeleton(predictedPoses[0], face);
+  } else {
+    illustration.updateSkeleton(predictedPoses[0], null);
+  }
+  illustration.draw(canvasScope, sourceImages.boy_doughnut.width, sourceImages.boy_doughnut.height);
+
+  if (guiState.showCurves) {
+    illustration.debugDraw(canvasScope);
+  }
+  if (guiState.showLabels) {
+    illustration.debugDrawLabel(canvasScope);
+  }
 }
 
 /**
@@ -171,20 +172,26 @@ function drawDetectionResults() {
  * calculates poses based on the model outputs
  */
 async function testImageAndEstimatePoses() {
-  // toggleLoadingUI(true);
+  toggleLoadingUI(true);
   setStatusText("Loading FaceMesh model...");
   document.getElementById("results").style.display = "none";
 
   // Reload facemesh model to purge states from previous runs.
-  // facemesh = await facemesh_module.load();
+  facemesh = await facemesh_module.load();
 
   // Load an example image
   setStatusText("Loading image...");
   // sourceImage = await loadImage(sourceImages[guiState.sourceImage]);
 
   // Estimates poses
-  setStatusText("Predicting!");
-
+  // setStatusText('Predicting...');
+  // predictedPoses = await posenet.estimatePoses(sourceImage, {
+  //   flipHorizontal: false,
+  //   decodingMethod: 'multi-person',
+  //   maxDetections: defaultMaxDetections,
+  //   scoreThreshold: defaultMinPartConfidence,
+  //   nmsRadius: defaultNmsRadius,
+  // });
   // faceDetection = await facemesh.estimateFaces(sourceImage, false, false);
 
   // Draw poses.
@@ -238,16 +245,17 @@ export async function bindPage() {
   canvas.height = CANVAS_HEIGHT;
   canvasScope.setup(canvas);
 
-  await tf.setBackend("webgl");
+  // await tf.setBackend('webgl');
   setStatusText("Loading PoseNet model...");
   // posenet = await posenet_module.load({
   //   architecture: resnetArchitectureName,
   //   outputStride: defaultStride,
   //   inputResolution: defaultInputResolution,
   //   multiplier: defaultMultiplier,
-  //   quantBytes: defaultQuantBytes,
+  //   quantBytes: defaultQuantBytes
   // });
 
+  // setupGui(posenet);
   setStatusText("Loading SVG file...");
   await loadSVG(Object.values(avatarSvgs)[0]);
 }
