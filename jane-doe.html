@@ -8,7 +8,6 @@
       position: absolute;
       left: 600px;
       top: 100px;
-      border: 1px solid #eeeeee;
     }
 
     .detection-canvas {
@@ -103,14 +102,15 @@
 </head>
 
 <body>
+  <h4>Jane Doe</h4>
   <div id="loading">
     <span id="status"></span>
     <span class="sk-spinner sk-spinner-pulse"></span>
   </div>
   <div id='main'>
-    <div id='results' style='display:none'>
+    <div id='results'>
       <div id="multi">
-        <h4>Pose Animator - Static Image Demo</h4>
+        
         <video id="video" playsinline style=" -moz-transform: scaleX(-1);
           -o-transform: scaleX(-1);
           -webkit-transform: scaleX(-1);
@@ -119,6 +119,7 @@
           ">
         </video>
         <canvas class="detection-canvas"></canvas>
+
         <canvas class="illustration-canvas"></cavnas>
       </div>
     </div>
@@ -126,10 +127,7 @@
   <div class="footer">
     <div class="footer-text">
       <p>
-        Pose Animator runs TF.js <strong>FaceMesh</strong> and <strong>PoseNet</strong> models to animate SVG illustrations with camera feed / static images.<br>
-        It currently supports <strong>single-pose</strong>, <strong>single-face</strong> detection, and has been tested on Destkop Chrome & iOS Safari.
-        <br>
-        (PoseNet model config - MobileNet V1, output stride 16, quant bytes 2)
+        Attribution: The animator is adapted Pose Animator by @yemont.
       </p>
     </div>
   </div>
