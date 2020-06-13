@@ -103,24 +103,33 @@
 </head>
 
 <body>
-
+  <div id="loading">
+    <span id="status"></span>
+    <span class="sk-spinner sk-spinner-pulse"></span>
+  </div>
   <div id='main'>
-    <div id='results'>
+    <div id='results' style='display:none'>
       <div id="multi">
-        <h4>Jane Doe</h4>
-        <div id="loading">
-          <span id="status"></span>
-          <span class="sk-spinner sk-spinner-pulse"></span>
-        </div>
-        <canvas class="illustration-canvas"></canvas>
+        <h4>Pose Animator - Static Image Demo</h4>
+        <video id="video" playsinline style=" -moz-transform: scaleX(-1);
+          -o-transform: scaleX(-1);
+          -webkit-transform: scaleX(-1);
+          transform: scaleX(-1);
+          display: none;
+          ">
+        </video>
+        <canvas class="detection-canvas"></canvas>
+        <canvas class="illustration-canvas"></cavnas>
       </div>
     </div>
   </div>
-  
   <div class="footer">
     <div class="footer-text">
       <p>
-        Code attribution: The pose animation is adapted from Pose Animator by @yemont.
+        Pose Animator runs TF.js <strong>FaceMesh</strong> and <strong>PoseNet</strong> models to animate SVG illustrations with camera feed / static images.<br>
+        It currently supports <strong>single-pose</strong>, <strong>single-face</strong> detection, and has been tested on Destkop Chrome & iOS Safari.
+        <br>
+        (PoseNet model config - MobileNet V1, output stride 16, quant bytes 2)
       </p>
     </div>
   </div>
