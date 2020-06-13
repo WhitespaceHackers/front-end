@@ -102,6 +102,9 @@ function drawResults(image, canvas, faceDetection, poses) {
   poses.forEach((pose) => {
     if (pose.score >= defaultMinPoseConfidence) {
       // if (guiState.showKeypoints) {
+
+      // remove the head animation
+      // const bodyKeypoints = pose.keypoints.filter(part => part != "nose" && part != "leftEye" && part != "rightEye" && part != "leftEar" && part != "rightEar" )
         drawKeypoints(pose.keypoints, defaultMinPartConfidence, ctx);
       // }
 
@@ -255,7 +258,7 @@ export async function bindPage() {
   canvasScope.setup(canvas);
 
   // await tf.setBackend('webgl');
-  setStatusText("Loading PoseNet model...");
+  // setStatusText("Loading PoseNet model...");
   // posenet = await posenet_module.load({
   //   architecture: resnetArchitectureName,
   //   outputStride: defaultStride,
