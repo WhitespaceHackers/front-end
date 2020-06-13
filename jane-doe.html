@@ -8,7 +8,6 @@
       position: absolute;
       left: 600px;
       top: 100px;
-      border: 1px solid #eeeeee;
     }
 
     .detection-canvas {
@@ -103,24 +102,32 @@
 </head>
 
 <body>
-
+  <h4>Jane Doe</h4>
+  <div id="loading">
+    <span id="status"></span>
+    <span class="sk-spinner sk-spinner-pulse"></span>
+  </div>
   <div id='main'>
     <div id='results'>
       <div id="multi">
-        <h4>Jane Doe</h4>
-        <div id="loading">
-          <span id="status"></span>
-          <span class="sk-spinner sk-spinner-pulse"></span>
-        </div>
-        <canvas class="illustration-canvas"></canvas>
+        
+        <video id="video" playsinline style=" -moz-transform: scaleX(-1);
+          -o-transform: scaleX(-1);
+          -webkit-transform: scaleX(-1);
+          transform: scaleX(-1);
+          display: none;
+          ">
+        </video>
+        <canvas class="detection-canvas"></canvas>
+
+        <canvas class="illustration-canvas"></cavnas>
       </div>
     </div>
   </div>
-  
   <div class="footer">
     <div class="footer-text">
       <p>
-        Code attribution: The pose animation is adapted from Pose Animator by @yemont.
+        Attribution: The animator is adapted Pose Animator by @yemont.
       </p>
     </div>
   </div>

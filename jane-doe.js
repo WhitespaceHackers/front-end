@@ -15,16 +15,16 @@
  * =============================================================================
  */
 
-import * as posenet_module from "@tensorflow-models/posenet";
-import * as facemesh_module from "@tensorflow-models/facemesh";
-import * as tf from "@tensorflow/tfjs";
+// import * as posenet_module from "@tensorflow-models/posenet";
+// import * as facemesh_module from "@tensorflow-models/facemesh";
+// import * as tf from "@tensorflow/tfjs";
 import * as paper from "paper";
 import "babel-polyfill";
 
 import dat from "dat.gui";
 import { SVGUtils } from "./utils/svgUtils";
 import { PoseIllustration } from "./illustrationGen/illustration";
-import { Skeleton, facePartName2Index } from "./illustrationGen/skeleton";
+import { Skeleton } from "./illustrationGen/skeleton";
 import { toggleLoadingUI, setStatusText } from "./utils/demoUtils";
 
 import * as boySVG from "./resources/illustration/boy.svg";
@@ -84,8 +84,8 @@ const defaultMultiplier = 1.0;
 const defaultStride = 16;
 const defaultInputResolution = 257;
 const defaultMaxDetections = 1;
-const defaultMinPartConfidence = 0.1;
-const defaultMinPoseConfidence = 0.2;
+const defaultMinPartConfidence = 0.5;
+const defaultMinPoseConfidence = 0.5;
 const defaultNmsRadius = 20.0;
 
 let predictedPoses;
@@ -96,25 +96,28 @@ let sourceImage;
  * Draws a pose if it passes a minimum confidence onto a canvas.
  * Only the pose's keypoints that pass a minPartConfidence are drawn.
  */
-function drawResults(image, canvas, faceDetection, pose) {
+function drawResults(image, canvas, faceDetection, poses) {
   // renderImageToCanvas(image, [VIDEO_WIDTH, VIDEO_HEIGHT], canvas);
   const ctx = canvas.getContext("2d");
-
-  fetch("https://mdjj-api.us-south.cf.appdomain.cloud/api")
-  .then((response) => response.json())
-  .then((pose) => {
-    console.log(pose)
+  poses.forEach((pose) => {
     if (pose.score >= defaultMinPoseConfidence) {
-      if (guiState.showKeypoints) {
+      // if (guiState.showKeypoints) {
         drawKeypoints(pose.keypoints, defaultMinPartConfidence, ctx);
-      }
-  
-      if (guiState.showSkeleton) {
+      // }
+
+      // if (guiState.showSkeleton) {
         drawSkeleton(pose.keypoints, defaultMinPartConfidence, ctx);
-      }
+      // }
     }
-  })
-  .catch((error) => console.log(error));
+  });
+  // if (guiState.showKeypoints) {
+  //   faceDetection.forEach(face => {
+  //     Object.values(facePartName2Index).forEach(index => {
+  //         let p = face.scaledMesh[index];
+  //         drawPoint(ctx, p[1], p[0], 3, 'red');
+  //     });
+  //   });
+  // }
 }
 
 async function loadImage(imagePath) {
@@ -143,7 +146,7 @@ function getIllustrationCanvas() {
  */
 function drawDetectionResults() {
   const canvas = multiPersonCanvas();
-  drawResults(sourceImage, canvas, faceDetection, predictedPoses);
+  drawResults(null, canvas, faceDetection, predictedPoses);
   if (!predictedPoses || !predictedPoses.length || !illustration) {
     return;
   }
@@ -151,20 +154,15 @@ function drawDetectionResults() {
   skeleton.reset();
   canvasScope.project.clear();
 
-  if (faceDetection && faceDetection.length > 0) {
-    let face = Skeleton.toFaceFrame(faceDetection[0]);
-    illustration.updateSkeleton(predictedPoses[0], face);
-  } else {
-    illustration.updateSkeleton(predictedPoses[0], null);
-  }
-  illustration.draw(canvasScope, sourceImages.boy_doughnut.width, sourceImages.boy_doughnut.height);
+  illustration.updateSkeleton(predictedPoses[0], null);
+  illustration.draw(canvasScope, 1000, 500);
 
-  if (guiState.showCurves) {
-    illustration.debugDraw(canvasScope);
-  }
-  if (guiState.showLabels) {
-    illustration.debugDrawLabel(canvasScope);
-  }
+  // if (guiState.showCurves) {
+  //   illustration.debugDraw(canvasScope);
+  // }
+  // if (guiState.showLabels) {
+  //   illustration.debugDrawLabel(canvasScope);
+  // }
 }
 
 /**
@@ -173,18 +171,18 @@ function drawDetectionResults() {
  */
 async function testImageAndEstimatePoses() {
   toggleLoadingUI(true);
-  setStatusText("Loading FaceMesh model...");
-  document.getElementById("results").style.display = "none";
+  // setStatusText("Loading FaceMesh model...");
+  // document.getElementById("results").style.display = "none";
 
   // Reload facemesh model to purge states from previous runs.
-  facemesh = await facemesh_module.load();
+  // facemesh = await facemesh_module.load();
 
   // Load an example image
-  setStatusText("Loading image...");
+  // setStatusText("Loading image...");
   // sourceImage = await loadImage(sourceImages[guiState.sourceImage]);
 
   // Estimates poses
-  // setStatusText('Predicting...');
+  // setStatusText("Predicting...");
   // predictedPoses = await posenet.estimatePoses(sourceImage, {
   //   flipHorizontal: false,
   //   decodingMethod: 'multi-person',
@@ -192,6 +190,17 @@ async function testImageAndEstimatePoses() {
   //   scoreThreshold: defaultMinPartConfidence,
   //   nmsRadius: defaultNmsRadius,
   // });
+
+  let response = await fetch(
+    "https://mdjj-api.us-south.cf.appdomain.cloud/api"
+  );
+
+  let data = await response.json();
+
+  console.log(data.fall)
+  predictedPoses = [data];
+  console.log(predictedPoses);
+
   // faceDetection = await facemesh.estimateFaces(sourceImage, false, false);
 
   // Draw poses.
@@ -203,7 +212,7 @@ async function testImageAndEstimatePoses() {
 
 let guiState = {
   // Selected image
-  sourceImage: Object.keys(sourceImages)[0],
+  // sourceImage: Object.keys(sourceImages)[0],
   avatarSVG: Object.keys(avatarSvgs)[0],
   // Detection debug
   showKeypoints: true,
@@ -256,7 +265,7 @@ export async function bindPage() {
   // });
 
   // setupGui(posenet);
-  setStatusText("Loading SVG file...");
+  // setStatusText("Loading SVG file...");
   await loadSVG(Object.values(avatarSvgs)[0]);
 }
 
@@ -269,5 +278,8 @@ async function loadSVG(target) {
   skeleton = new Skeleton(svgScope);
   illustration = new PoseIllustration(canvasScope);
   illustration.bindSkeleton(skeleton, svgScope);
-  testImageAndEstimatePoses();
+  setInterval(() => {
+    console.log("refetching pose data");
+    testImageAndEstimatePoses();
+  }, 5000);
 }
