@@ -10,17 +10,15 @@
       }
 
       .header {
-  overflow: hidden;
-  background-color: #76afa0;
-  padding: 5px 5px;
-  text-align: center;
-
-}
-
+        overflow: hidden;
+        background-color: #76afa0;
+        padding: 5px 5px;
+        text-align: center;
+      }
 
       .row-container {
         display: grid;
-        grid-template-columns: repeat( auto-fit, minmax(500px, 1fr) );
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
         grid-gap: 1rem;
         margin: 2rem;
       }
@@ -85,10 +83,10 @@
       }
       @keyframes blinkingText {
         0% {
-          color: red;
+          color: #DC143C;
         }
         49% {
-          color: red;
+          color: #DC143C;
         }
         60% {
           color: transparent;
@@ -97,7 +95,7 @@
           color: transparent;
         }
         100% {
-          color: red;
+          color: #DC143C;
         }
       }
       /*
@@ -191,24 +189,27 @@
   </head>
 
   <body>
-
     <div class="header">
       <h1 style="color: white">Jane Doe</h1>
     </div>
     <div class="name">
-      <h3 id="fall-status" class="blinking">FALL DETECTED</h3>
-      <p id="fall-time">12/07/2020 18:09:34</p>
+      <h3 id="fall-status" class="blinking"><span style="color: #76afa0">STATUS: OK</span></h3>
+      <p id="fall-time"></p>
     </div>
 
     <div class="row-container">
       <div class="charts-container">
         <h4>
           <span class="heart-icon">
-            <i class="fas fa-heart fa-beat" style="color: #DC143C"></i> </span
-          > Heart rate: <span id="heart-rate">70</span> bpm
+            <i class="fas fa-heart fa-beat" style="color: #DC143C"></i>
+          </span>
+          Heart rate: <span id="heart-rate">70</span> bpm
         </h4>
         <canvas id="heartRate-chart" width="500" height="200"></canvas>
-        <h4><span><i class="fas fa-shoe-prints" style="color: blue"></i></span> Steps taken today: <span id="steps">3990</span> steps</h4>
+        <h4>
+          <span><i class="fas fa-shoe-prints" style="color: #76afa0"></i></span>
+          Steps taken today: <span id="steps">3990</span> steps
+        </h4>
         <canvas id="steps-chart" width="500" height="200"></canvas>
       </div>
       <script>
