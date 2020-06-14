@@ -4,18 +4,19 @@
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:"Trebuchet MS", Helvetica, sans-serif;
+  background-color: #ddd;
 }
 
 .header {
   overflow: hidden;
-  background-color: #f1f1f1;
+  background-color: #76afa0;
   padding: 20px 10px;
 }
 
 .header a {
   float: left;
-  color: black;
+  color: white;
   text-align: center;
   padding: 12px;
   text-decoration: none;
@@ -61,7 +62,7 @@ main {
 
 .persons {
   display: grid;
-  grid-template-columns: auto auto auto auto auto;
+  grid-template-columns: repeat( auto-fit, minmax(200px, 1fr) );
   grid-gap: 1rem;
 }
 
@@ -70,6 +71,7 @@ main {
   transition: 0.3s;
   text-align: center;
   border-radius: 10px;
+  background-color: #fff;
 }
 
 .card:hover {

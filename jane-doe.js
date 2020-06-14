@@ -102,11 +102,11 @@ function drawResults(image, canvas, faceDetection, poses) {
   poses.forEach((pose) => {
     if (pose.score >= defaultMinPoseConfidence) {
       // if (guiState.showKeypoints) {
-        drawKeypoints(pose.keypoints, defaultMinPartConfidence, ctx);
+      drawKeypoints(pose.keypoints, defaultMinPartConfidence, ctx);
       // }
 
       // if (guiState.showSkeleton) {
-        drawSkeleton(pose.keypoints, defaultMinPartConfidence, ctx);
+      drawSkeleton(pose.keypoints, defaultMinPartConfidence, ctx);
       // }
     }
   });
@@ -191,13 +191,52 @@ async function testImageAndEstimatePoses() {
   //   nmsRadius: defaultNmsRadius,
   // });
 
+  console.log("awaiting data")
   let response = await fetch(
     "https://mdjj-api.us-south.cf.appdomain.cloud/api"
   );
-
+console.log("data received")
   let data = await response.json();
 
-  console.log(data.fall)
+  console.log(data.fall, data.heartRate, data.steps);
+
+  document.getElementById("steps").innerHTML = data.steps;
+  document.getElementById("heart-rate").innerHTML = data.heartRate;
+
+  if (data.fall) {
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+    var yyyy = today.getFullYear();
+    var h = today.getHours();
+    var m = today.getMinutes();
+    var s = today.getSeconds();
+    if (dd < 10) {
+      dd = "0" + dd;
+    }
+
+    if (mm < 10) {
+      mm = "0" + mm;
+    }
+
+    if (m < 10) {
+      m = "0" + m;
+    }
+
+    if (s < 10) {
+      s = "0" + s;
+    }
+
+    var dateString = today = dd+'/'+mm+'/'+yyyy;
+    var timeString = h + ":" + m + ":" + s;
+    var fallMessage = "FALL DETECTED";
+    var fallTime = dateString + " " + timeString; 
+    
+    document.getElementById("fall-status").innerHTML = fallMessage;
+    document.getElementById("fall-time").innerHTML = fallTime;
+
+  }
+
   predictedPoses = [data];
   console.log(predictedPoses);
 
@@ -255,7 +294,7 @@ export async function bindPage() {
   canvasScope.setup(canvas);
 
   // await tf.setBackend('webgl');
-  setStatusText("Loading PoseNet model...");
+  // setStatusText("Loading PoseNet model...");
   // posenet = await posenet_module.load({
   //   architecture: resnetArchitectureName,
   //   outputStride: defaultStride,
