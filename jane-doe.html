@@ -1,137 +1,281 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <title>Jane Doe</title>
+    <style type="text/css">
+      body {
+        margin: 0;
+        font-family: 'Trebuchet MS', Helvetica, sans-serif;
+        background-color: ;
+      }
 
-<head>
-  <title>PoseNet - Coco Images Demo</title>
-  <style type='text/css'>
-    .illustration-canvas {
-      position: absolute;
-      left: 600px;
-      top: 100px;
-    }
+      .header {
+        overflow: hidden;
+        background-color: #76afa0;
+        padding: 5px 5px;
+        text-align: center;
+      }
 
-    .detection-canvas {
-      position: absolute;
-      left: 10px;
-      top: 100px;
-    }
+      .row-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        grid-gap: 1rem;
+        margin: 2rem;
+      }
 
-    h3,
-    h4,
-    p {
-      margin: 10px 0;
-    }
+      .charts-container {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        float: left;
+      }
 
-    #main ul {
-      margin: 10px 0;
-      padding: 0;
-    }
+      .animation-container {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        justify-items: center;
+      }
 
-    #main li {
-      list-style-type: none;
-      display: inline-block;
-    }
+      h3,
+      h4,
+      p {
+        margin: 10px 0;
+      }
 
-    #status {
-      display: inline-block;
-    }
+      .name {
+        text-align: center;
+      }
+      #main ul {
+        margin: 10px 0;
+        padding: 0;
+      }
 
-    #results>div {
-      display: inline-block;
-      width: 513px
-    }
+      #main li {
+        list-style-type: none;
+        display: inline-block;
+      }
 
-    .footer {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      color: black;
-    }
+      #status {
+        display: inline-block;
+      }
 
-    .footer-text {
-      max-width: 600px;
-      margin: auto;
-    }
+      #results > div {
+        display: inline-block;
+        width: 513px;
+      }
 
-    /*
+      .footer {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        color: black;
+      }
+
+      .footer-text {
+        max-width: 600px;
+        margin: auto;
+      }
+
+      .blinking {
+        animation: blinkingText 1.2s infinite;
+      }
+      @keyframes blinkingText {
+        0% {
+          color: #DC143C;
+        }
+        49% {
+          color: #DC143C;
+        }
+        60% {
+          color: transparent;
+        }
+        99% {
+          color: transparent;
+        }
+        100% {
+          color: #DC143C;
+        }
+      }
+      /*
      *  The following loading spinner CSS is from SpinKit project
      *  https://github.com/tobiasahlin/SpinKit
      */
-    .sk-spinner-pulse {
-      width: 20px;
-      height: 20px;
-      margin: auto 10px;
-      float: left;
-      background-color: #333;
-      border-radius: 100%;
-      -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
-      animation: sk-pulseScaleOut 1s infinite ease-in-out;
-    }
-
-    @-webkit-keyframes sk-pulseScaleOut {
-      0% {
-        -webkit-transform: scale(0);
-        transform: scale(0);
+      .sk-spinner-pulse {
+        position: relative;
+        z-index: 100;
+        width: 20px;
+        height: 20px;
+        margin: auto 10px;
+        float: left;
+        overflow: auto;
+        background-color: #333;
+        border-radius: 100%;
+        -webkit-animation: sk-pulseScaleOut 1s infinite ease-in-out;
+        animation: sk-pulseScaleOut 1s infinite ease-in-out;
       }
 
-      100% {
-        -webkit-transform: scale(1.0);
-        transform: scale(1.0);
-        opacity: 0;
+      @-webkit-keyframes sk-pulseScaleOut {
+        0% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        }
+
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+          opacity: 0;
+        }
       }
-    }
 
-    @keyframes sk-pulseScaleOut {
-      0% {
-        -webkit-transform: scale(0);
-        transform: scale(0);
+      @keyframes sk-pulseScaleOut {
+        0% {
+          -webkit-transform: scale(0);
+          transform: scale(0);
+        }
+
+        100% {
+          -webkit-transform: scale(1);
+          transform: scale(1);
+          opacity: 0;
+        }
       }
 
-      100% {
-        -webkit-transform: scale(1.0);
-        transform: scale(1.0);
-        opacity: 0;
+      .spinner-text {
+        float: left;
       }
-    }
 
-    .spinner-text {
-      float: left;
-    }
-  </style>
-</head>
+      /* heart beating animation */
+      .fa-beat {
+        animation: fa-beat 5s ease infinite;
+      }
+      @keyframes fa-beat {
+        0% {
+          transform: scale(1);
+        }
+        5% {
+          transform: scale(1.25);
+        }
+        20% {
+          transform: scale(1);
+        }
+        30% {
+          transform: scale(1);
+        }
+        35% {
+          transform: scale(1.25);
+        }
+        50% {
+          transform: scale(1);
+        }
+        55% {
+          transform: scale(1.25);
+        }
+        70% {
+          transform: scale(1);
+        }
+      }
+    </style>
 
-<body>
-  <h4>Jane Doe</h4>
-  <div id="loading">
-    <span id="status"></span>
-    <span class="sk-spinner sk-spinner-pulse"></span>
-  </div>
-  <div id='main'>
-    <div id='results'>
-      <div id="multi">
-        
-        <video id="video" playsinline style=" -moz-transform: scaleX(-1);
-          -o-transform: scaleX(-1);
-          -webkit-transform: scaleX(-1);
-          transform: scaleX(-1);
-          display: none;
-          ">
-        </video>
-        <canvas class="detection-canvas"></canvas>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/0.2.0/Chart.min.js"
+      type="text/javascript"
+    ></script>
+    <script
+      src="https://kit.fontawesome.com/bf05d78857.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
 
-        <canvas class="illustration-canvas"></cavnas>
+  <body>
+    <div class="header">
+      <h1 style="color: white">Jane Doe</h1>
+    </div>
+    <div class="name">
+      <h3 id="fall-status" class="blinking"><span style="color: #76afa0">STATUS: OK</span></h3>
+      <p id="fall-time"></p>
+    </div>
+
+    <div class="row-container">
+      <div class="charts-container">
+        <h4>
+          <span class="heart-icon">
+            <i class="fas fa-heart fa-beat" style="color: #DC143C"></i>
+          </span>
+          Heart rate: <span id="heart-rate">70</span> bpm
+        </h4>
+        <canvas id="heartRate-chart" width="500" height="200"></canvas>
+        <h4>
+          <span><i class="fas fa-shoe-prints" style="color: #76afa0"></i></span>
+          Steps taken today: <span id="steps">3990</span> steps
+        </h4>
+        <canvas id="steps-chart" width="500" height="200"></canvas>
+      </div>
+      <script>
+        var heartRateData = {
+          labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          datasets: [
+            {
+              label: 'Heart rate',
+              fillColor: 'rgba(220,220,220,0.2)',
+              strokeColor: 'rgba(220,220,220,1)',
+              pointColor: 'rgba(220,220,220,1)',
+              pointStrokeColor: '#fff',
+              pointHighlightFill: '#fff',
+              pointHighlightStroke: 'rgba(220,220,220,1)',
+              data: [70, 70, 70, 72, 76, 80, 88, 85, 85, 80, 75, 75, 70, 70]
+            }
+          ]
+        }
+        var stepsData = {
+          labels: ['Sun', 'Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Sat'],
+          datasets: [
+            {
+              label: 'Steps taken',
+              fillColor: 'rgba(220,220,220,0.2)',
+              strokeColor: 'rgba(220,220,220,1)',
+              pointColor: 'rgba(220,220,220,1)',
+              pointStrokeColor: '#fff',
+              pointHighlightFill: '#fff',
+              pointHighlightStroke: 'rgba(220,220,220,1)',
+              data: [4533, 7857, 5050, 4560, 2345, 5646, 3990]
+            }
+          ]
+        }
+
+        var options = {}
+        // Get the context of the canvas element we want to select
+        var heartRate = document
+          .getElementById('heartRate-chart')
+          .getContext('2d')
+        var steps = document.getElementById('steps-chart').getContext('2d')
+        new Chart(heartRate).Line(heartRateData, options)
+        new Chart(steps).Line(stepsData, options)
+      </script>
+
+      <div class="animation-container">
+        <canvas class="illustration-canvas"></canvas>
+        <div id="loading" style="overflow: auto;">
+          <span style="text-align: left;">Loading real-time position</span>
+          <span class="sk-spinner sk-spinner-pulse"></span>
+        </div>
+        <p>
+          Attribution: The animator is adapted from Pose Animator by @yemont.
+        </p>
       </div>
     </div>
-  </div>
-  <div class="footer">
-    <div class="footer-text">
-      <p>
-        Attribution: The animator is adapted Pose Animator by @yemont.
-      </p>
-    </div>
-  </div>
-  <script src="jane-doe.js"></script>
-</body>
 
+    <div id="main">
+      <div id="results">
+        <div id="multi">
+          <canvas class="detection-canvas" style="display: none;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="footer-text"></div>
+    </div>
+    <script src="jane-doe.js"></script>
+  </body>
 </html>
